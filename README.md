@@ -1,4 +1,4 @@
 ### Usage
 
-1. [Download the decrypt.html file](https://github.com/standardfile/decrypt/releases/download/1/decrypt.html).
+1. <a href="https://raw.githubusercontent.com/standardfile/decrypt/master/decrypt.html" download="decrypt.html">Download the decrypt.html file.<a>
 2. Open the file with a web browser.
