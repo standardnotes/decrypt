@@ -8,13 +8,13 @@ To further your protections against general disruptions in your network or ours,
 
 ### Decrypting a Backup Offline
 
-1. [Download the offline decrypt script.](https://raw.githubusercontent.com/standardfile/decrypt/master/decrypt.html)
+1 – [Download the offline decrypt script.](https://raw.githubusercontent.com/standardfile/decrypt/master/decrypt.html)
 
    You can right click the link above and choose "Save link as", or open the page directly and save the page with Cmd/Ctrl + S.
 
    _Always make sure you get this script from a trusted source, such as our website._
 
-2. Open the file with a web browser.
+2 – Open the file with a web browser.
 
 ### Creating Backups
 
