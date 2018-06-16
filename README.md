@@ -8,7 +8,7 @@ To further your protections against general disruptions in your network or ours,
 
 ### Decrypting a Backup Offline
 
-[Download the offline decrypt script.](https://raw.githubusercontent.com/standardfile/decrypt/master/decrypt.html) and open it with any browser.
+[Download the offline decrypt script](https://raw.githubusercontent.com/standardfile/decrypt/master/decrypt.html) and open it with any browser.
 
 You can right click the link above and choose "Save link as", or open the page directly and save the page with Cmd/Ctrl + S.
 
