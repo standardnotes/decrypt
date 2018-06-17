@@ -117,11 +117,13 @@
           for(var item of data.items) {
             try {
               await SFJS.itemTransformer.decryptItem(item, keys);
-              item.content = JSON.parse(item.content);
+              if(typeof item.content == "string") {
+                item.content = JSON.parse(item.content);
+              }
             } catch(error) {
               showErrorAlert = true;
               errorCount++;
-              console.error("Error decrypting:", error);
+              console.error("Error decrypting item:", item, error);
               continue;
             }
             delete item.auth_params;
