@@ -29,7 +29,7 @@
 
   <div>
     <p>Use this offline tool to decrypt your encrypted Standard Notes backup file(s).</p>
-    <p>Any issues? Send an email to <a href="mailto:hello@standardnotes.org">hello@standardnotes.org</a>.
+    <p>Any questions? Send an email to <a href="mailto:hello@standardnotes.org">hello@standardnotes.org</a>.
   </div>
 
   <div style="margin-top: 30px;">
@@ -40,13 +40,13 @@
       </li>
 
       <li>
-        <input type="password" id="password" placeholder="Enter Password" autocomplete="off" />
+        <input type="password" id="password" placeholder="Account password at time of backup" autocomplete="off" />
       </li>
 
       <li>
         <button onclick="downloadAsImportFile()">Download as decrypted import file</button>
         or
-        <button onclick="downloadAsPlain()">Download as plaintext files</button>
+        <button onclick="downloadAsPlain()">Download as zipped plaintext files</button>
       </li>
     </ol>
   </div>
@@ -206,6 +206,9 @@
         name = item.content_type;
         contents = JSON.stringify(item.content, null, 2);
       }
+
+      // Remove slashes
+      name = name.replace(/\//g, "").replace(/\\+/g, "");
 
       name = `${item.content_type}/${name}-${item.uuid.split("-")[0]}.txt`
       zip.file(name, contents);
