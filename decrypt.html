@@ -210,7 +210,14 @@
       // Remove slashes
       name = name.replace(/\//g, "").replace(/\\+/g, "");
 
-      name = `${item.content_type}/${name}-${item.uuid.split("-")[0]}.txt`
+      // ('-' + first section of UUID + '.txt')
+      var filenameEnd = `-${item.uuid.split("-")[0]}.txt`
+
+      // Standard max filename length is 255
+      // Slice the note name down to allow filenameEnd
+      name = name.slice(0, (255 - filenameEnd.length));
+
+      name = `${item.content_type}/${name}${filenameEnd}`
       zip.file(name, contents);
     }
 
