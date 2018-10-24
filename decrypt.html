@@ -207,6 +207,10 @@
         contents = JSON.stringify(item.content, null, 2);
       }
 
+      if(!name) {
+        name = "";
+      }
+
       // Remove slashes
       name = name.replace(/\//g, "").replace(/\\+/g, "");
 
