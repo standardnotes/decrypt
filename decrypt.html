@@ -138,7 +138,9 @@
       for(let item of data.items) {
         try {
           await SFJS.itemTransformer.decryptItem(item, keys);
-          item.content = JSON.parse(item.content);
+          if(typeof item.content == "string") {
+            item.content = JSON.parse(item.content);
+          }
         } catch(error) {
           showErrorAlert = true;
           errorCount++;
