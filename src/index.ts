@@ -212,10 +212,12 @@ async function createDecryptedBackup() {
 
   const application = await createApplication();
   await application.importData(data as BackupFile, getPassword());
-  return application.createBackupFile(
+  const backupFile = application.createBackupFile(
     undefined,
     EncryptionIntent.FileDecrypted
   );
+  await application.signOut();
+  return backupFile;
 }
 
 function getPassword(): string {
