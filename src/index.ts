@@ -17,6 +17,8 @@ declare const JSZip: any;
 const KEYCHAIN_STORAGE_KEY = 'keychain';
 
 class WebDeviceInterface extends DeviceInterface {
+  private storage: Record<string, string> = {};
+
   constructor() {
     super(window.setTimeout, window.setInterval);
   }
@@ -26,26 +28,26 @@ class WebDeviceInterface extends DeviceInterface {
   }
 
   async getRawStorageValue(key: string) {
-    return localStorage.getItem(key);
+    return this.storage[key];
   }
 
   async getAllRawStorageKeyValues() {
-    return Object.entries(localStorage).map(([key, value]) => ({
+    return Object.entries(this.storage).map(([key, value]) => ({
       key,
       value,
     }));
   }
 
   async setRawStorageValue(key: string, value: string) {
-    localStorage.setItem(key, value);
+    this.storage[key] = value;
   }
 
   async removeRawStorageValue(key: string) {
-    localStorage.removeItem(key);
+    delete this.storage[key];
   }
 
   async removeAllRawStorageValues() {
-    localStorage.clear();
+    this.storage = {};
   }
 
   async openDatabase(_identifier: string) {
@@ -66,19 +68,16 @@ class WebDeviceInterface extends DeviceInterface {
 
   async getAllRawDatabasePayloads(identifier: any) {
     const models = [];
-    for (const key in localStorage) {
+    for (const key in this.storage) {
       if (key.startsWith(this._getDatabaseKeyPrefix(identifier))) {
-        models.push(JSON.parse(localStorage[key]));
+        models.push(JSON.parse(this.storage[key]));
       }
     }
     return models;
   }
 
   async saveRawDatabasePayload(payload: { uuid: any }, identifier: any) {
-    localStorage.setItem(
-      this._keyForPayloadId(payload.uuid, identifier),
-      JSON.stringify(payload)
-    );
+    this.storage[this._keyForPayloadId(payload.uuid, identifier)] = JSON.stringify(payload);
   }
 
   async saveRawDatabasePayloads(payloads: any, identifier: any) {
@@ -88,13 +87,13 @@ class WebDeviceInterface extends DeviceInterface {
   }
 
   async removeRawDatabasePayloadWithId(id: any, identifier: any) {
-    localStorage.removeItem(this._keyForPayloadId(id, identifier));
+    delete this.storage[this._keyForPayloadId(id, identifier)];
   }
 
   async removeAllRawDatabasePayloads(identifier: any) {
-    for (const key in localStorage) {
+    for (const key in this.storage) {
       if (key.startsWith(this._getDatabaseKeyPrefix(identifier))) {
-        delete localStorage[key];
+        delete this.storage[key];
       }
     }
   }
@@ -113,13 +112,11 @@ class WebDeviceInterface extends DeviceInterface {
     if (!keychain) {
       keychain = {};
     }
-    localStorage.setItem(
-      KEYCHAIN_STORAGE_KEY,
-      JSON.stringify({
-        ...keychain,
-        [identifier]: value,
-      })
-    );
+
+    this.storage[KEYCHAIN_STORAGE_KEY] = JSON.stringify({
+      ...keychain,
+      [identifier]: value,
+    });
   }
 
   async clearNamespacedKeychainValue(identifier: string | number) {
@@ -128,16 +125,16 @@ class WebDeviceInterface extends DeviceInterface {
       return;
     }
     delete keychain[identifier];
-    localStorage.setItem(KEYCHAIN_STORAGE_KEY, JSON.stringify(keychain));
+    this.storage[KEYCHAIN_STORAGE_KEY] = JSON.stringify(keychain);
   }
 
   async getRawKeychainValue() {
-    const keychain = localStorage.getItem(KEYCHAIN_STORAGE_KEY);
+    const keychain = this.storage[KEYCHAIN_STORAGE_KEY] || null;
     return JSON.parse(keychain!);
   }
 
   async clearRawKeychainValue() {
-    localStorage.removeItem(KEYCHAIN_STORAGE_KEY);
+    this.storage[KEYCHAIN_STORAGE_KEY];
   }
 }
 
