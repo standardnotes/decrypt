@@ -3678,9 +3678,9 @@ snapdragon@^0.8.1:
   version "1.2.0"
   resolved "https://codeload.github.com/standardnotes/sncrypto/tar.gz/5f8cd369773cec7f342c23ecaa659d932b35cd31"
 
-"snjs@github:standardnotes/snjs":
+"snjs@github:standardnotes/snjs#2009f754384475bfc6a2658eb247e1192f12c784":
   version "1.0.5"
-  resolved "https://codeload.github.com/standardnotes/snjs/tar.gz/45299648aec40c63d66c0d83e9953dc267e67f2a"
+  resolved "https://codeload.github.com/standardnotes/snjs/tar.gz/2009f754384475bfc6a2658eb247e1192f12c784"
 
 sockjs-client@1.4.0:
   version "1.4.0"

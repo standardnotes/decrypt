@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "sncrypto": "github:standardnotes/sncrypto",
-    "snjs": "github:standardnotes/snjs"
+    "snjs": "github:standardnotes/snjs#2009f754384475bfc6a2658eb247e1192f12c784"
   },
   "devDependencies": {
     "copy-webpack-plugin": "^6.2.1",

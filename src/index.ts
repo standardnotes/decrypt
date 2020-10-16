@@ -6,7 +6,8 @@ import {
   SNAlertService,
   SNApplication,
   DeviceInterface,
-  EncryptionIntent
+  EncryptionIntent,
+  StorageEncryptionPolicies
 } from 'snjs';
 import { SNWebCrypto } from 'sncrypto/dist/sncrypto-web';
 import { BackupFile } from 'snjs/dist/@types/services/protocol_service';
@@ -179,6 +180,7 @@ async function createApplication() {
     new WebAlertService(),
     'decrypt-script'
   );
+  application.enableEphemeralPersistencePolicy();
   await application.prepareForLaunch({
     receiveChallenge() {
       throw new Error('Method not implemented.');
@@ -211,6 +213,7 @@ async function createDecryptedBackup() {
   const data = await readFile(files[0]);
 
   const application = await createApplication();
+
   await application.importData(data as BackupFile, getPassword());
   const backupFile = application.createBackupFile(
     undefined,
