@@ -8,7 +8,7 @@ To further your protections against general disruptions in your network or ours,
 
 ### Decrypting a Backup Offline
 
-[Download the offline decrypt script](https://raw.githubusercontent.com/standardfile/decrypt/master/decrypt.html) and open it with any browser.
+[Download the offline decrypt script](https://raw.githubusercontent.com/standardfile/decrypt/master/dist/decrypt.html) and open it with any browser.
 
 You can right click the link above and choose "Save link as", or open the page directly and save the page with Cmd/Ctrl + S.
 
@@ -25,3 +25,16 @@ There are two ways to create backups of your note data:
 #### Need help? We're here for you.
 
 Find some frequently asked questions as well as ways to get in touch on the [Help](https://standardnotes.org/help) page.
+
+## Building the script yourself
+
+This script was built with [Node.js](https://nodejs.org/) v14. Make sure it is installed on your system.
+Then, in the repo, run the following commands:
+
+1. `yarn install`
+2. `yarn run build`
+
+(You can replace `yarn` with `npm` if you want)
+
+
+This will output a new `dist/decrypt.html` file.
