@@ -1,14 +1,14 @@
 {
   "name": "decrypt",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "scripts": {
     "build": "webpack --mode='production'",
     "postbuild": "inline-assets dist/decrypt.html dist/decrypt.html && rimraf dist/index.js",
     "dev": "webpack-dev-server"
   },
   "dependencies": {
-    "sncrypto": "github:standardnotes/sncrypto",
-    "snjs": "github:standardnotes/snjs#2009f754384475bfc6a2658eb247e1192f12c784"
+    "@standardnotes/sncrypto-web": "^1.2.9",
+    "@standardnotes/snjs": "^2.0.13"
   },
   "devDependencies": {
     "copy-webpack-plugin": "^6.2.1",

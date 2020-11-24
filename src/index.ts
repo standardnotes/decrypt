@@ -7,12 +7,15 @@ import {
   SNApplication,
   DeviceInterface,
   EncryptionIntent,
-  StorageEncryptionPolicies
-} from 'snjs';
-import { SNWebCrypto } from 'sncrypto/dist/sncrypto-web';
-import { BackupFile } from 'snjs/dist/@types/services/protocol_service';
+  BackupFile,
+  SNLog
+} from '@standardnotes/snjs';
+import { SNWebCrypto } from '@standardnotes/sncrypto-web';
 
 declare const JSZip: any;
+
+SNLog.onLog = console.log;
+SNLog.onError = console.error;
 
 const KEYCHAIN_STORAGE_KEY = 'keychain';
 
@@ -77,7 +80,9 @@ class WebDeviceInterface extends DeviceInterface {
   }
 
   async saveRawDatabasePayload(payload: { uuid: any }, identifier: any) {
-    this.storage[this._keyForPayloadId(payload.uuid, identifier)] = JSON.stringify(payload);
+    this.storage[
+      this._keyForPayloadId(payload.uuid, identifier)
+    ] = JSON.stringify(payload);
   }
 
   async saveRawDatabasePayloads(payloads: any, identifier: any) {
@@ -131,6 +136,10 @@ class WebDeviceInterface extends DeviceInterface {
   async getRawKeychainValue() {
     const keychain = this.storage[KEYCHAIN_STORAGE_KEY] || null;
     return JSON.parse(keychain!);
+  }
+
+  async legacy_setRawKeychainValue(value: unknown) {
+    this.storage[KEYCHAIN_STORAGE_KEY] = JSON.stringify(value);
   }
 
   async clearRawKeychainValue() {
