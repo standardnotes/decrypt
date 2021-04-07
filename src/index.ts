@@ -272,7 +272,7 @@ async function createDecryptedBackup(): Promise<BackupFile> {
     throw Error(result.error);
   } else if (result.errorCount) {
     if (result.affectedItems.length === 0) {
-      throw Error('No item could be decrypted.')
+      throw Error('No item could be decrypted.');
     } else {
       alert(
         `${result.errorCount} items could not be decrypted. ` +
@@ -351,6 +351,12 @@ function downloadData(data: object | string, filename: string) {
 
 function downloadPlaintextDataZip(data: BackupFile, filename: string) {
   const zip = new JSZip();
+
+  zip.file(
+    zippableTxtName('Standard Notes Backup and Import File'),
+    JSON.stringify(data, null, 2)
+  );
+
   for (const item of data.items) {
     let name: string;
     let contents: string;
