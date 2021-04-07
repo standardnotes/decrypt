@@ -8,7 +8,9 @@ import {
   DeviceInterface,
   EncryptionIntent,
   BackupFile,
-  SNLog
+  SNLog,
+  ChallengeReason,
+  ChallengeValue,
 } from '@standardnotes/snjs';
 import { SNWebCrypto } from '@standardnotes/sncrypto-web';
 
@@ -184,12 +186,22 @@ async function createApplication() {
     new WebDeviceInterface(),
     new SNWebCrypto(),
     new WebAlertService(),
-    'decrypt-script'
+    'decrypt-script',
+    [],
+    'offline-host'
   );
   application.enableEphemeralPersistencePolicy();
   await application.prepareForLaunch({
-    receiveChallenge() {
-      throw new Error('Method not implemented.');
+    receiveChallenge(challenge) {
+      if (challenge.reason === ChallengeReason.ImportEncryptedFile) {
+        application.submitValuesForChallenge(challenge, [
+          new ChallengeValue(challenge.prompts[0], getPassword()),
+        ]);
+      } else {
+        throw new Error(
+          `Unknown challenge reason ${ChallengeReason[challenge.reason]}`
+        );
+      }
     },
   });
   return application;
@@ -204,14 +216,49 @@ document.getElementById('chooser')!.addEventListener(
   false
 );
 
-document
-  .getElementById('download-import-file')!
-  .addEventListener('click', downloadAsImportFile);
-document
-  .getElementById('download-plain-text')!
-  .addEventListener('click', downloadAsPlain);
+const downloadAsImportFileEl = document.getElementById(
+  'download-import-file'
+) as HTMLButtonElement;
+downloadAsImportFileEl.addEventListener('click', async () => {
+  try {
+    showProgressIndicator();
+    await downloadAsImportFile();
+  } finally {
+    hideProgressIndicator();
+  }
+});
 
-async function createDecryptedBackup() {
+const downloadAsPlainEl = document.getElementById(
+  'download-plain-text'
+) as HTMLButtonElement;
+downloadAsPlainEl.addEventListener('click', async () => {
+  try {
+    showProgressIndicator();
+    await downloadAsPlain();
+  } finally {
+    hideProgressIndicator();
+  }
+});
+
+const downloadButtons = [downloadAsImportFileEl, downloadAsPlainEl];
+
+const progressIndicator = document.getElementById('progress-indicator');
+
+function showProgressIndicator() {
+  for (const button of downloadButtons) {
+    button.disabled = true;
+  }
+  progressIndicator.style.display = 'block';
+}
+
+function hideProgressIndicator() {
+  for (const button of downloadButtons) {
+    button.disabled = false;
+  }
+  progressIndicator.style.display = 'none';
+}
+
+async function createDecryptedBackup(): Promise<BackupFile> {
   if (!files) {
     alert('You must select a file first.');
     return;
@@ -220,9 +267,20 @@ async function createDecryptedBackup() {
 
   const application = await createApplication();
 
-  await application.importData(data as BackupFile, getPassword());
+  const result = await application.importData(data as BackupFile);
+  if ('error' in result) {
+    throw Error(result.error);
+  } else if (result.errorCount) {
+    if (result.affectedItems.length === 0) {
+      throw Error('No item could be decrypted.')
+    } else {
+      alert(
+        `${result.errorCount} items could not be decrypted. ` +
+          `Please make sure the password you entered is correct, and try again.`
+      );
+    }
+  }
   const backupFile = application.createBackupFile(
-    undefined,
     EncryptionIntent.FileDecrypted
   );
   await application.signOut();
@@ -237,7 +295,10 @@ async function downloadAsImportFile() {
   try {
     const decryptedBackup = await createDecryptedBackup();
     if (decryptedBackup) {
-      downloadData(decryptedBackup, 'decrypted-sn-data.txt', false);
+      downloadData(
+        JSON.stringify(decryptedBackup, null, 2),
+        'decrypted-sn-data.txt'
+      );
     }
   } catch (e) {
     console.error(e);
@@ -252,10 +313,7 @@ async function downloadAsPlain() {
   try {
     const decryptedBackup = await createDecryptedBackup();
     if (decryptedBackup) {
-      downloadPlaintextDataZip(
-        JSON.parse(decryptedBackup),
-        'decrypted-sn-data'
-      );
+      downloadPlaintextDataZip(decryptedBackup, 'decrypted-sn-data');
     }
   } catch (e) {
     console.error(e);
@@ -276,15 +334,16 @@ async function readFile(file: Blob): Promise<any> {
   });
 }
 
-function downloadData(data: any, filename: string, json: boolean) {
-  if (json) {
-    data = JSON.stringify(data, null, 2 /* pretty print */);
+function downloadData(data: object | string, filename: string) {
+  if (typeof data !== 'object' && typeof data !== 'string') {
+    throw Error('Unknown data format: ' + data);
   }
-  data = new Blob([data], { type: 'text/json' });
+
+  const blob = new Blob([data as BlobPart], { type: 'text/json' });
 
   const link = document.createElement('a');
   link.setAttribute('download', filename);
-  link.href = window.URL.createObjectURL(data);
+  link.href = window.URL.createObjectURL(blob);
   document.body.appendChild(link);
   link.click();
   link.remove();
@@ -307,22 +366,25 @@ function downloadPlaintextDataZip(data: BackupFile, filename: string) {
     if (!name) {
       name = '';
     }
+    name = zippableTxtName(name, `-${item.uuid.split('-')[0]}`);
 
-    // Remove slashes
-    name = name.replace(/\//g, '').replace(/\\+/g, '');
+    name = `${sanitizeFileName(item.content_type)}/${name}`;
 
-    // ('-' + first section of UUID + '.txt')
-    const filenameEnd = `-${item.uuid.split('-')[0]}.txt`;
-
-    // Standard max filename length is 255
-    // Slice the note name down to allow filenameEnd
-    name = name.slice(0, 255 - filenameEnd.length);
-
-    name = `${item.content_type}/${name}${filenameEnd}`;
     zip.file(name, contents);
   }
 
   zip.generateAsync({ type: 'blob' }).then(function (content: any) {
-    downloadData(content, filename + '.zip', false);
+    downloadData(content, filename + '.zip');
   });
+}
+
+function sanitizeFileName(name: string): string {
+  return name.trim().replace(/[.\\/:"?*|<>]/g, '_');
+}
+
+function zippableTxtName(name: string, suffix = ''): string {
+  const sanitizedName = sanitizeFileName(name);
+  const nameEnd = suffix + '.txt';
+  const maxFileNameLength = 100;
+  return sanitizedName.slice(0, maxFileNameLength - nameEnd.length) + nameEnd;
 }
