@@ -193,7 +193,7 @@ async function createApplication() {
   application.enableEphemeralPersistencePolicy();
   await application.prepareForLaunch({
     receiveChallenge(challenge) {
-      if (challenge.reason === ChallengeReason.ImportEncryptedFile) {
+      if (challenge.reason === ChallengeReason.DecryptEncryptedFile) {
         application.submitValuesForChallenge(challenge, [
           new ChallengeValue(challenge.prompts[0], getPassword()),
         ]);
