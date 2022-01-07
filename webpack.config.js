@@ -1,5 +1,6 @@
 const path = require('path');
 const CopyPlugin = require('copy-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = (_, env) => ({
   entry: './src/index.ts',
@@ -49,5 +50,18 @@ module.exports = (_, env) => ({
       crypto: false,
       path: false
     },
+  },
+
+  optimization: {
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          format: {
+            comments: false,
+          },
+        },
+        extractComments: false,
+      })
+    ],
   },
 });
