@@ -3,13 +3,25 @@ const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = (_, env) => ({
   entry: './src/index.ts',
+
   output: {
     path: path.join(__dirname, 'dist'),
     filename: 'index.js',
   },
+
   devServer: {
-    contentBase: path.join(__dirname, 'src'),
+    historyApiFallback: {
+      index: 'decrypt.html'
+    },
+    static: {
+      directory: path.join(__dirname, 'src'),
+      serveIndex: false
+    },
+    client: {
+      overlay: false,
+    }
   },
+
   module: {
     rules: [
       {
@@ -24,9 +36,18 @@ module.exports = (_, env) => ({
       },
     ],
   },
+
   plugins: [
     new CopyPlugin({
       patterns: [{ from: 'src/decrypt.html' }],
     }),
   ],
+
+  resolve: {
+    extensions: ['.ts', '.js'],
+    fallback: {
+      crypto: false,
+      path: false
+    }
+  },
 });
