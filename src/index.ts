@@ -2,10 +2,7 @@ import {
   Environment,
   Platform,
   platformFromString,
-  DismissBlockingDialog,
-  SNAlertService,
   SNApplication,
-  DeviceInterface,
   EncryptionIntent,
   BackupFile,
   SNLog,
@@ -14,170 +11,20 @@ import {
 } from '@standardnotes/snjs';
 import { SNWebCrypto } from '@standardnotes/sncrypto-web';
 
-declare const JSZip: any;
+import {
+  getPackageVersion,
+  getPlatformString,
+  sanitizeFileName,
+  zippableTxtName,
+  readFile
+} from './utils';
+import WebDeviceInterface from './deviceInterface';
+import WebAlertService from './alertService';
+
+import * as JSZip from 'jszip/dist/jszip.min.js';
 
 SNLog.onLog = console.log;
 SNLog.onError = console.error;
-
-const KEYCHAIN_STORAGE_KEY = 'keychain';
-
-class WebDeviceInterface extends DeviceInterface {
-  private storage: Record<string, string> = {};
-
-  constructor() {
-    super(window.setTimeout, window.setInterval);
-  }
-
-  openUrl(): void {
-    throw new Error('Method not implemented.');
-  }
-
-  async getRawStorageValue(key: string) {
-    return this.storage[key];
-  }
-
-  async getAllRawStorageKeyValues() {
-    return Object.entries(this.storage).map(([key, value]) => ({
-      key,
-      value,
-    }));
-  }
-
-  async setRawStorageValue(key: string, value: string) {
-    this.storage[key] = value;
-  }
-
-  async removeRawStorageValue(key: string) {
-    delete this.storage[key];
-  }
-
-  async removeAllRawStorageValues() {
-    this.storage = {};
-  }
-
-  async openDatabase(_identifier: string) {
-    return {};
-  }
-
-  _getDatabaseKeyPrefix(identifier: any) {
-    if (identifier) {
-      return `${identifier}-item-`;
-    } else {
-      return 'item-';
-    }
-  }
-
-  _keyForPayloadId(id: any, identifier: any) {
-    return `${this._getDatabaseKeyPrefix(identifier)}${id}`;
-  }
-
-  async getAllRawDatabasePayloads(identifier: any) {
-    const models = [];
-    for (const key in this.storage) {
-      if (key.startsWith(this._getDatabaseKeyPrefix(identifier))) {
-        models.push(JSON.parse(this.storage[key]));
-      }
-    }
-    return models;
-  }
-
-  async saveRawDatabasePayload(payload: { uuid: any }, identifier: any) {
-    this.storage[
-      this._keyForPayloadId(payload.uuid, identifier)
-    ] = JSON.stringify(payload);
-  }
-
-  async saveRawDatabasePayloads(payloads: any, identifier: any) {
-    for (const payload of payloads) {
-      await this.saveRawDatabasePayload(payload, identifier);
-    }
-  }
-
-  async removeRawDatabasePayloadWithId(id: any, identifier: any) {
-    delete this.storage[this._keyForPayloadId(id, identifier)];
-  }
-
-  async removeAllRawDatabasePayloads(identifier: any) {
-    for (const key in this.storage) {
-      if (key.startsWith(this._getDatabaseKeyPrefix(identifier))) {
-        delete this.storage[key];
-      }
-    }
-  }
-
-  /** @keychain */
-  async getNamespacedKeychainValue(identifier: string | number) {
-    const keychain = await this.getRawKeychainValue();
-    if (!keychain) {
-      return;
-    }
-    return keychain[identifier];
-  }
-
-  async setNamespacedKeychainValue(value: any, identifier: any) {
-    let keychain = await this.getRawKeychainValue();
-    if (!keychain) {
-      keychain = {};
-    }
-
-    this.storage[KEYCHAIN_STORAGE_KEY] = JSON.stringify({
-      ...keychain,
-      [identifier]: value,
-    });
-  }
-
-  async clearNamespacedKeychainValue(identifier: string | number) {
-    const keychain = await this.getRawKeychainValue();
-    if (!keychain) {
-      return;
-    }
-    delete keychain[identifier];
-    this.storage[KEYCHAIN_STORAGE_KEY] = JSON.stringify(keychain);
-  }
-
-  async getRawKeychainValue() {
-    const keychain = this.storage[KEYCHAIN_STORAGE_KEY] || null;
-    return JSON.parse(keychain!);
-  }
-
-  async legacy_setRawKeychainValue(value: unknown) {
-    this.storage[KEYCHAIN_STORAGE_KEY] = JSON.stringify(value);
-  }
-
-  async clearRawKeychainValue() {
-    this.storage[KEYCHAIN_STORAGE_KEY];
-  }
-}
-
-function getPlatformString() {
-  try {
-    const platform = navigator.platform.toLowerCase();
-    let trimmed = '';
-    if (platform.indexOf('mac') !== -1) {
-      trimmed = 'mac';
-    } else if (platform.indexOf('win') !== -1) {
-      trimmed = 'windows';
-    }
-    if (platform.indexOf('linux') !== -1) {
-      trimmed = 'linux';
-    }
-    return trimmed + '-web';
-  } catch (e) {
-    return 'unknown-platform';
-  }
-}
-
-class WebAlertService implements SNAlertService {
-  confirm(): Promise<boolean> {
-    throw new Error('Method not implemented.');
-  }
-  alert(): Promise<void> {
-    throw new Error('Method not implemented.');
-  }
-  blockingDialog(): DismissBlockingDialog | Promise<DismissBlockingDialog> {
-    throw new Error('Method not implemented.');
-  }
-}
 
 async function createApplication() {
   const application = new SNApplication(
@@ -188,9 +35,11 @@ async function createApplication() {
     new WebAlertService(),
     'decrypt-script',
     [],
-    'offline-host'
+    'offline-host',
+    getPackageVersion()
   );
-  application.enableEphemeralPersistencePolicy();
+
+  await application.enableEphemeralPersistencePolicy();
   await application.prepareForLaunch({
     receiveChallenge(challenge) {
       if (challenge.reason === ChallengeReason.DecryptEncryptedFile) {
@@ -204,6 +53,7 @@ async function createApplication() {
       }
     },
   });
+
   return application;
 }
 
@@ -324,16 +174,6 @@ async function downloadAsPlain() {
   }
 }
 
-async function readFile(file: Blob): Promise<any> {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      resolve(JSON.parse(e.target!.result as string));
-    };
-    reader.readAsText(file);
-  });
-}
-
 function downloadData(data: object | string, filename: string) {
   if (typeof data !== 'object' && typeof data !== 'string') {
     throw Error('Unknown data format: ' + data);
@@ -382,15 +222,4 @@ function downloadPlaintextDataZip(data: BackupFile, filename: string) {
   zip.generateAsync({ type: 'blob' }).then(function (content: any) {
     downloadData(content, filename + '.zip');
   });
-}
-
-function sanitizeFileName(name: string): string {
-  return name.trim().replace(/[.\\/:"?*|<>]/g, '_');
-}
-
-function zippableTxtName(name: string, suffix = ''): string {
-  const sanitizedName = sanitizeFileName(name);
-  const nameEnd = suffix + '.txt';
-  const maxFileNameLength = 100;
-  return sanitizedName.slice(0, maxFileNameLength - nameEnd.length) + nameEnd;
 }
