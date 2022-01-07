@@ -48,6 +48,6 @@ module.exports = (_, env) => ({
     fallback: {
       crypto: false,
       path: false
-    }
+    },
   },
 });
