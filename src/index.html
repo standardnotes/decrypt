@@ -36,9 +36,10 @@
         <div class="content">
           <ol class="instructions">
             <li class="step">
-              <label class="description" for="chooser">Choose file to decrypt</label>
-              <input class="button" type="file" id="chooser" name="files[]" />
-              <button class="button">Browse files</button>
+              <span class="description">Choose file to decrypt</span>
+              <p id="selected-file"></p>
+              <label class="button" for="chooser">Browse files</label>
+              <input type="file" id="chooser" name="files[]" hidden />
             </li>
   
             <li class="step">
@@ -56,7 +57,7 @@
           </ol>
   
           <div class="progress" id="progress-indicator">
-            <span>Generating export...</span>
+            <span>Generating export, please wait...</span>
           </div>
         </div>
   

@@ -59,11 +59,25 @@ async function createApplication() {
   return application;
 }
 
-let files: FileList | null;
+const selectedFileEl = document.getElementById(
+  'selected-file'
+) as HTMLUListElement;
+
+let selectedFile: File | null;
 document.getElementById('chooser')!.addEventListener(
   'change',
   (event) => {
-    files = (event.target as HTMLInputElement).files;
+    const files = (event.target as HTMLInputElement).files;
+
+    const hasSelectedFiles = files.length > 0;
+    selectedFileEl.style.display = hasSelectedFiles ? 'block' : 'none';
+
+    if (!hasSelectedFiles) {
+      return;
+    }
+
+    selectedFile = files[0];
+    selectedFileEl.innerText = selectedFile.name;
   },
   false
 );
@@ -111,12 +125,12 @@ function hideProgressIndicator() {
 }
 
 async function createDecryptedBackup(): Promise<BackupFile> {
-  if (!files) {
+  if (!selectedFile) {
     alert('You must select a file first.');
     return;
   }
-  const data = await readFile(files[0]);
 
+  const data = await readFile(selectedFile);
   const application = await createApplication();
 
   const result = await application.importData(data as BackupFile);
