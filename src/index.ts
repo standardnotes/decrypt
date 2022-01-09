@@ -1,3 +1,5 @@
+import './assets/styles/main.scss';
+
 import {
   Environment,
   Platform,

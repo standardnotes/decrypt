@@ -1,6 +1,8 @@
 const path = require('path');
-const CopyPlugin = require('copy-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = (_, env) => ({
   entry: './src/index.ts',
@@ -11,9 +13,6 @@ module.exports = (_, env) => ({
   },
 
   devServer: {
-    historyApiFallback: {
-      index: 'decrypt.html'
-    },
     static: {
       directory: path.join(__dirname, 'src'),
       serveIndex: false
@@ -35,17 +34,47 @@ module.exports = (_, env) => ({
           },
         },
       },
+      {
+        test: /\.(s(a|c)ss)$/,
+        use: [
+          MiniCssExtractPlugin.loader,
+          'css-loader',
+          {
+            loader: 'sass-loader'
+          }
+        ],
+      },
+      {
+        test: /\.(svg|jpg|png)$/,
+        type: 'asset/resource',
+      },
+      {
+        test: /\.(woff(2)?)(\?[a-z0-9]+)?$/,
+        type: 'asset/resource',
+      },
     ],
   },
 
   plugins: [
     new CopyPlugin({
-      patterns: [{ from: 'src/decrypt.html' }],
+      patterns: [{ from: 'src/assets/images', to: 'assets/images' }],
+    }),
+    new MiniCssExtractPlugin(),
+    new HtmlWebpackPlugin({
+      title: 'Decrypt your Standard Notes files',
+      template: 'src/index.html',
+      scriptLoading: 'blocking'
     }),
   ],
 
   resolve: {
-    extensions: ['.ts', '.js'],
+    extensions: [
+      '.ts',
+      '.js',
+      '.css',
+      '.sass',
+      '.scss'
+    ],
     fallback: {
       crypto: false,
       path: false
