@@ -63,7 +63,8 @@ module.exports = (_, env) => ({
     new HtmlWebpackPlugin({
       title: 'Decrypt your Standard Notes files',
       template: 'src/index.html',
-      scriptLoading: 'blocking'
+      scriptLoading: 'blocking',
+      inject: false
     }),
   ],
 
