@@ -1,0 +1,46 @@
+@font-face {
+  font-display: swap;
+  font-family: 'Lato';
+  font-style: normal;
+  font-weight: normal;
+  src:
+    local('Lato Regular'),
+    url('../fonts/Lato-Regular.woff');
+  unicode-range: U+000-5FF;
+}
+
+@font-face {
+  font-display: swap;
+  font-family: 'Avenir Next';
+  font-style: normal;
+  font-weight: normal;
+  src:
+    local('Avenir Next Regular'),
+    url('../fonts/AvenirNext-Regular.woff2') format('woff2'),
+    url('../fonts/AvenirNext-Regular.woff') format('woff');
+  unicode-range: U+000-5FF;
+}
+
+@font-face {
+  font-display: swap;
+  font-family: 'Avenir Next';
+  font-style: normal;
+  font-weight: 600;
+  src:
+    local('Avenir Next Demi Bold'),
+    url('../fonts/AvenirNext-DemiBold.woff2') format('woff2'),
+    url('../fonts/AvenirNext-DemiBold.woff') format('woff');
+  unicode-range: U+000-5FF;
+}
+
+@font-face {
+  font-display: swap;
+  font-family: 'Avenir Next';
+  font-style: normal;
+  font-weight: 700;
+  src:
+    local('Avenir Next Bold'),
+    url('../fonts/AvenirNext-Bold.woff2') format('woff2'),
+    url('../fonts/AvenirNext-Bold.woff') format('woff');
+  unicode-range: U+000-5FF;
+}

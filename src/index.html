@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+  <head>
+    <title><%= htmlWebpackPlugin.options.title %></title>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+    <meta charset="UTF-8" />
+    <%= htmlWebpackPlugin.tags.headTags %>
+  </head>
+
+  <body>
+
+    <section class="wrapper">
+
+      <section class="brand">
+        <img class="icon" alt="Standard Notes" src="assets/images/sn-logo.svg" />
+        <h2 class="name">Standard Notes</h2>
+      </section>
+  
+      <section class="container">
+        <div class="header">
+
+          <div class="title">
+            <div class="icon-container">
+              <img class="icon" src="assets/images/unlock-icon.svg" />
+            </div>
+            <h1 class="text">Decrypt your Standard Notes backup file</h1>
+          </div>
+  
+          <div class="help">
+            <p>Use this offline tool to decrypt your encrypted Standard Notes backup file.</p>
+            <p>If you have any questions, please send an email to <a href="mailto:help@standardnotes.com">help@standardnotes.com</a>.
+          </div>
+        </div>
+  
+        <div class="content">
+          <ol class="instructions">
+            <li class="step">
+              <span class="description">Choose file to decrypt</span>
+              <p id="selected-file"></p>
+              <label class="button" for="chooser">Browse files</label>
+              <input type="file" id="chooser" name="files[]" hidden />
+            </li>
+  
+            <li class="step">
+              <label class="description" for="password">Enter your account password at the time of backup</label>
+              <input class="password-field" type="password" id="password" placeholder="Password" autocomplete="off" />
+            </li>
+  
+            <li class="step">
+              <span class="description">Download files</span>
+              <div class="button-group">
+                <button class="button" id="download-import-file">Download as decrypted import file</button>
+                <button class="button" id="download-plain-text">Download as zipped plaintext files</button>
+              </div>
+            </li>
+          </ol>
+  
+          <div class="progress" id="progress-indicator">
+            <span>Generating export, please wait...</span>
+          </div>
+        </div>
+  
+      </section>
+
+    </section>
+
+    <%= htmlWebpackPlugin.tags.bodyTags %>
+
+  </body>
+
+</html>
