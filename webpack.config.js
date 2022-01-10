@@ -61,7 +61,7 @@ module.exports = (_, env) => ({
     }),
     new MiniCssExtractPlugin(),
     new HtmlWebpackPlugin({
-      title: 'Decrypt your Standard Notes files',
+      title: 'Decrypt your Standard Notes file',
       template: 'src/index.html',
       scriptLoading: 'blocking',
       inject: false
