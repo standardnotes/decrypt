@@ -67,17 +67,12 @@ let selectedFile: File | null;
 document.getElementById('chooser')!.addEventListener(
   'change',
   (event) => {
-    const files = (event.target as HTMLInputElement).files;
-
+    const { files } = (event.target as HTMLInputElement);
     const hasSelectedFiles = files.length > 0;
+
+    selectedFile = hasSelectedFiles ? files[0] : null;
+    selectedFileEl.innerText = hasSelectedFiles ? selectedFile.name : '';
     selectedFileEl.style.display = hasSelectedFiles ? 'block' : 'none';
-
-    if (!hasSelectedFiles) {
-      return;
-    }
-
-    selectedFile = files[0];
-    selectedFileEl.innerText = selectedFile.name;
   },
   false
 );
