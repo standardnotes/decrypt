@@ -152,10 +152,6 @@ function getPassword(): string {
   return (document.getElementById('password')! as HTMLInputElement).value;
 }
 
-function clearPassword() {
-  (document.getElementById('password')! as HTMLInputElement).value = '';
-}
-
 async function downloadAsImportFile() {
   try {
     const decryptedBackup = await createDecryptedBackup();
@@ -202,8 +198,6 @@ function downloadData(data: object | string, filename: string) {
   document.body.appendChild(link);
   link.click();
   link.remove();
-
-  clearPassword();
 }
 
 function downloadPlaintextDataZip(data: BackupFile, filename: string) {
