@@ -1,0 +1,5 @@
+dist/
+!dist/decrypt.html
+src/
+webpack.config.js
+yarn.lock
