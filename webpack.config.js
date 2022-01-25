@@ -26,7 +26,7 @@ module.exports = (_, env) => ({
     rules: [
       {
         test: /\.ts$/,
-        exclude: /(node_modules|snjs)/,
+        exclude: /(node_modules)/,
         use: {
           loader: 'ts-loader',
           options: {
