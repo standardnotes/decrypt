@@ -68,10 +68,10 @@ document.getElementById('chooser')!.addEventListener(
   'change',
   (event) => {
     const { files } = (event.target as HTMLInputElement);
-    const hasSelectedFiles = files.length > 0;
+    const hasSelectedFiles = files!.length > 0;
 
-    selectedFile = hasSelectedFiles ? files[0] : null;
-    selectedFileEl.innerText = hasSelectedFiles ? selectedFile.name : '';
+    selectedFile = hasSelectedFiles ? files![0] : null;
+    selectedFileEl.innerText = hasSelectedFiles ? selectedFile!.name : '';
     selectedFileEl.style.display = hasSelectedFiles ? 'block' : 'none';
   },
   false
@@ -109,17 +109,17 @@ function showProgressIndicator() {
   for (const button of downloadButtons) {
     button.disabled = true;
   }
-  progressIndicator.style.display = 'block';
+  progressIndicator!.style.display = 'block';
 }
 
 function hideProgressIndicator() {
   for (const button of downloadButtons) {
     button.disabled = false;
   }
-  progressIndicator.style.display = 'none';
+  progressIndicator!.style.display = 'none';
 }
 
-async function createDecryptedBackup(): Promise<BackupFile> {
+async function createDecryptedBackup(): Promise<BackupFile | undefined> {
   if (!selectedFile) {
     alert('You must select a file first.');
     return;
@@ -129,6 +129,11 @@ async function createDecryptedBackup(): Promise<BackupFile> {
   const application = await createApplication();
 
   const result = await application.importData(data as BackupFile);
+
+  if (!result) {
+    return;
+  }
+
   if ('error' in result) {
     throw Error(result.error);
   } else if (result.errorCount) {

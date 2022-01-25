@@ -126,6 +126,6 @@ export default class WebDeviceInterface extends DeviceInterface {
   }
 
   async clearRawKeychainValue() {
-    this.storage[KEYCHAIN_STORAGE_KEY];
+    this.storage = {};
   }
 }
